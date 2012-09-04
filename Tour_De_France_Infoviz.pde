@@ -37,11 +37,16 @@ void setup()
 
 void plot()
 {
+  float prevYearsMapped = 0;
+  float prevDistanceMapped = 0;
   for (int i=0; i<numCases; ++i)
   {
+    stroke(#FABB00);
     fill(#FABB00);
     ellipse(yearsMapped[i], distanceMapped[i], 6, 6);
-    line(prevYearsMapped[i], prevDistanceMapped[i], yearsMapped[i], distanceMapped[i]);
+    if (i>0) line(prevYearsMapped, prevDistanceMapped, yearsMapped[i], distanceMapped[i]);
+    prevYearsMapped = yearsMapped[i];
+    prevDistanceMapped = distanceMapped[i];
   }
 }
 
@@ -64,6 +69,7 @@ void drawAxes()
 
 void draw()
 {
+  smooth();
   background(255);
   drawAxes();
   plot();
