@@ -20,6 +20,9 @@ float[] distance;
 float[] distanceMapped;
 float[] speed;
 float[] speedMapped;
+String[] winner;
+String[] country;
+String[] runnerup;
 
 ControlP5 controlP5;
 Toggle speedToggle;
@@ -28,10 +31,11 @@ boolean drawDistance;
 boolean drawSpeed;
 DropdownList yearList;
 int filterYear;
+String details;
 
 void setup()
 {
-    size(900, 600);
+    size(900, 630);
     background(bg);
     
     axesOffsetX = 100;
@@ -49,6 +53,9 @@ void setup()
     speed = new float[data.length-1];
     speedMapped = new float[data.length-1];
     drawSpeed = true;
+    winner = new String[data.length-1];
+    country = new String[data.length-1];
+    runnerup = new String[data.length-1];
     for (int i=0; i<numCases; ++i)
     {
         String currentRow = data[i+1]; //+1 to skip title row
@@ -56,6 +63,9 @@ void setup()
         years[i] = int(columns[0]);
         distance[i] = float(columns[16]);
         speed[i] = float(columns[17]);
+        winner[i] = columns[1];
+        country[i] = columns[3];
+        runnerup[i] = columns[5];
     }
     for (int i=0; i<numCases; ++i)
     {
@@ -111,7 +121,7 @@ void setup()
         yearList.captionLabel().style().marginTop = 1;
         yearList.setBarHeight(11);
         yearList.addItem("Show all years", 0);
-        for(int i=0; i<years.length; ++i)
+        for (int i=0; i<years.length; ++i)
         {
             if (32 <= i && i <= 38) continue;
             yearList.addItem(str(years[i]), i+1);
@@ -125,6 +135,62 @@ void controlEvent(ControlEvent theEvent)
     {
         filterYear = (int)yearList.value();
     }
+}
+
+void detailsOnDemand()
+{
+    if (drawDistance)
+    {
+        for (int i=0; i<numCases; ++i)
+        {
+            if
+            (
+                yearsMapped[i]-3 <= mouseX && mouseX <= yearsMapped[i]+3 && 
+                distanceMapped[i]-3 <= mouseY && mouseY <= distanceMapped[i]+3
+            )
+            {
+                showDetails(i);
+            }
+        }
+    }
+    if (drawSpeed)
+    {
+        for (int i=0; i<numCases; ++i)
+        {
+            if
+            (
+                yearsMapped[i]-3 <= mouseX && mouseX <= yearsMapped[i]+3 && 
+                speedMapped[i]-3 <= mouseY && mouseY <= speedMapped[i]+3
+            )
+            {
+                showDetails(i);
+            }
+        }
+    }
+}
+
+void showDetails(int i)
+{
+    if (filterYear != 0 & filterYear != i) return;
+    
+    int boxWidth = 350;
+    int leftShift = (i<floor(numCases/2)) ? 0 : boxWidth;
+    
+    fill(yellow);
+    stroke(black);
+    rect(mouseX-leftShift+5, mouseY+5, boxWidth, 110);
+    fill(black);
+    details = "Year:  "+years[i]+"\n"
+        +"Tour distance:  "+distance[i]+" km\n"
+        +"Winner's speed:  "+speed[i]+" km/h\n"
+        +"Winning rider:  "+winner[i]+" ("+country[i]+")"+"\n"
+        +"Runner up:  "+runnerup[i];
+    text
+    (
+        details, 
+        mouseX-leftShift+30, 
+        mouseY+30
+    );
 }
 
     
@@ -294,5 +360,6 @@ void draw()
     plot();
     drawMissingVals();
     drawLabels();
+    detailsOnDemand();
 }
 
